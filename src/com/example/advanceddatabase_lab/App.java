@@ -8,32 +8,34 @@ public class App {
     private final static String url ="jdbc:postgresql://localhost/postgres";
     private final static String user = "postgres";
     private final static String password = "Postgres21";
-    public Connection conn = null;
 
-    public Connection connect() {
+    public static Connection conn = null;
 
+    public static Connection connect() {
         try {
             conn = DriverManager.getConnection(url, user, password);
             System.out.println("Connected to the PostgreSQL server successfully");
         } catch (SQLException e) {
-            System.err.println(e.getClass().getName()+": "+e.getMessage());
-            System.out.println(e.getMessage());
+            System.err.println(e.getClass().getName()+ ": " + e.getMessage());
         }
         return conn;
     }
 
     public static void displaySwimmersAtLevel(int level) {
-    /*
-    System.out.println("Names and phones of all swimmers currently in level (of id) 3:");
-    System.out.println("fname" + " | " + "lname" + " | " + "phone");
+        try (Connection conn = connect();
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM coach;")) {
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString("lname") + "\t| " +
+                        resultSet.getString("fname") + "\t| " + resultSet.getString("phone") + "\t| "+ resultSet.getString("email") + "\t| ");
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getClass().getName()+ ": " + e.getMessage());
+            System.out.println(e.getMessage());
+        }
 //Please insert your SELECT statement for query the data (Names and phones of all swimmers currently in level (of id) 3) into "statement.executeQuery()"
-    ResultSet resultSet = statement.executeQuery("");
-    while (resultSet.next()) {
-        System.out.println(resultSet.getString("fname") + " | " + resultSet.getString("lname") + " | " + resultSet.getString("phone"));
-    }
-    sc.close();
 
-     */
+
     }
     public static void displayMultipleCaretakers() {
     /*
@@ -93,6 +95,26 @@ public class App {
             System.out.println("4. Quit");
             choice = sc.next().charAt(0);
 
+            switch (choice) {
+                case '1':
+                level = sc.nextInt();
+                displaySwimmersAtLevel(level);
+                break;
+
+                case '2':
+                    displayMultipleCaretakers();
+                    break;
+
+                case '3':
+                    displayVolunteeredCaretakers();
+                    break;
+                case '4':
+                    sc.close();
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("You've entered an invalid character!");
+            }
 
             if (choice == '1') {
                 level = sc.nextInt();
