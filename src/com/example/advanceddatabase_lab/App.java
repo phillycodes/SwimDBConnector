@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class App {
 
-    private final static String url ="jdbc:postgresql://localhost/postgres";
+    private final static String url = "jdbc:postgresql://localhost/postgres";
     private final static String user = "postgres";
     private final static String password = "Postgres21";
 
@@ -14,29 +14,30 @@ public class App {
     public static Connection connect() {
         try {
             conn = DriverManager.getConnection(url, user, password);
-            System.out.println("Connected to the PostgreSQL server successfully");
         } catch (SQLException e) {
-            System.err.println(e.getClass().getName()+ ": " + e.getMessage());
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
         return conn;
     }
 
-    public static void displaySwimmersAtLevel(int level) {
+    public static void displaySwimmersAtLevel(String level) {
+        System.out.println("First Name" + " | " + "Last Name" + " | " + "Phone");
         try (Connection conn = connect();
              Statement statement = conn.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM coach;")) {
+             ResultSet resultSet = statement.executeQuery("SELECT fname, lname, phone FROM swimmer WHERE currentlevelid = " + level)) {
             while (resultSet.next()) {
-                System.out.println(resultSet.getString("lname") + "\t| " +
-                        resultSet.getString("fname") + "\t| " + resultSet.getString("phone") + "\t| "+ resultSet.getString("email") + "\t| ");
+                System.out.println(resultSet.getString("fname") + " | " +
+                        resultSet.getString("lname") + "\t| " + resultSet.getString("phone"));
             }
         } catch (SQLException e) {
-            System.err.println(e.getClass().getName()+ ": " + e.getMessage());
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.out.println(e.getMessage());
         }
 //Please insert your SELECT statement for query the data (Names and phones of all swimmers currently in level (of id) 3) into "statement.executeQuery()"
 
 
     }
+
     public static void displayMultipleCaretakers() {
     /*
     System.out.println("Name(s) of caretakers who are the primary (main) caretakers of at least two swimmers:");
@@ -76,64 +77,72 @@ public class App {
 
     public static void main(String[] args) {
         try (Connection connection =
-                     DriverManager.getConnection(url, user, password)) { //"1122" is the password, and you need to replace it with your password
+                     DriverManager.getConnection(url, user, password)) {
 
             System.out.println("Java JDBC PostgreSQL swimmingorg");
             System.out.println("Connected to PostgreSQL database!");
-            Statement statement = connection.createStatement();
             System.out.println("Reading swimming records...");
 
-        char choice = '1';
-        int level;
-        while (choice != '4') {
-            // Create a Scanner object to read input.
+            char choice = '1';
+            int level;
             Scanner sc = new Scanner(System.in);
-            System.out.println("Please enter your choice:");
-            System.out.println("1. Names and phones of all swimmers currently in level");
-            System.out.println("2. Name(s) of caretakers who are the primary (main) caretakers of at least two swimmers:");
-            System.out.println("3. Names of all caretakers who have volunteered for the task 'Recording' but not the task 'Officiating':");
-            System.out.println("4. Quit");
-            choice = sc.next().charAt(0);
+            Scanner scanner = new Scanner(System.in);
+            while (choice != '4') {
+                // Create a Scanner object to read input.
+                System.out.println("1. Names and phones of all swimmers currently in level");
+                System.out.println("2. Name(s) of caretakers who are the primary (main) caretakers of at least two swimmers:");
+                System.out.println("3. Names of all caretakers who have volunteered for the task 'Recording' but not the task 'Officiating':");
+                System.out.println("4. Quit");
+                System.out.print("Please enter your choice: ");
+                choice = sc.next().charAt(0);
 
-            switch (choice) {
-                case '1':
-                level = sc.nextInt();
-                displaySwimmersAtLevel(level);
-                break;
+                switch (choice) {
+                    case '1':
+                        System.out.print("Enter Level: ");
+                        level = scanner.nextInt();
+                        System.out.println("");
+                        Integer levelInt = level;
+                        String levelString = levelInt.toString();
+                        displaySwimmersAtLevel(levelString);
+                        System.out.println();
+                        break;
 
-                case '2':
-                    displayMultipleCaretakers();
-                    break;
+                    case '2':
+                        displayMultipleCaretakers();
+                        break;
 
-                case '3':
-                    displayVolunteeredCaretakers();
-                    break;
-                case '4':
-                    sc.close();
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("You've entered an invalid character!");
+                    case '3':
+                        displayVolunteeredCaretakers();
+                        break;
+                    case '4':
+                        sc.close();
+                        scanner.close();
+                        System.out.println("Goodbye!");
+                        System.exit(0);
+                        break;
+                    default:
+                        System.out.println("You've entered an invalid character!");
+                        sc.close();
+                        scanner.close();
+                }
+
+//            if (choice == '1') {
+//                level = sc.nextInt();
+//                displaySwimmersAtLevel(level);
+//            } else if (choice == '2') {
+//                displayMultipleCaretakers();
+//            } else if (choice == '3') {
+//               displayVolunteeredCaretakers();
+//            } else if (choice == '4') {
+//                sc.close();
+//                System.exit(0);
+//            }
             }
-
-            if (choice == '1') {
-                level = sc.nextInt();
-                displaySwimmersAtLevel(level);
-            } else if (choice == '2') {
-                displayMultipleCaretakers();
-            } else if (choice == '3') {
-               displayVolunteeredCaretakers();
-            } else if (choice == '4') {
-                sc.close();
-                System.exit(0);
-            }
-            sc.close();
-        }
-    } catch (SQLException e) {
-            System.err.println(e.getClass().getName()+": "+e.getMessage());
+        } catch (SQLException e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.out.println(e.getMessage());
         }
-}
+    }
 
 }
 
